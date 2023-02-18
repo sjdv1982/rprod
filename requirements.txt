@@ -1,0 +1,8 @@
+- numpy
+- jsonschema==3.*
+- speg
+- cson
+- ruamel.yaml
+- requests
+- psutil
+- websockets
