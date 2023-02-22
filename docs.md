@@ -64,4 +64,12 @@ Note that this still doesn't federate against file renames or argument reorderin
 
 # Federation
 
-...
+The more federation, the more cache hits, and the more reproducibility (reasoning that two computations are the same).
+
+## rprod-bash
+
+- Federate against file renames (including different directories)
+- Federate against argument reordering
+- Federate with Seamless (specifically, the Seamless bash transformer). Only for script mode.
+
+rprod-py always federates, although celltypes must not change.
