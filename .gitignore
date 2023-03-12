@@ -1,0 +1,8 @@
+seamless.code-workspace
+.vscode/
+*.pyc
+**/build/*.1
+*.egg-info/
+*.*~
+*/__pycache__/
+*/.ipynb_checkpoints/

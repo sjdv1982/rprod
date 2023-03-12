@@ -11,21 +11,29 @@
 ## Run modes
 
 - Command mode: synthesize a command line (default)
-- Script mode: constant bash code, insert files and variables
+- Workspace mode: constant bash code, insert files and variables
 
-## Guess modes
+## Guess rules
 
-How to guess what is a file and what is a value
+How to guess what is a file/directory and what is a value. (Only in workspace mode, it is possible to have file patterns as well.)
 
-1. Any argument with extension that exists as a file or directory is a file or directory
-2. Any argument with extension that does not exist => stop
-3. Any argument ending with a slash must be a directory, else => stop
-4. Any argument without extension that exists as directory is a directory
-5. Any argument without extension that does not exist as a file or directory is a value
-6. Any argument without extension that exists as a file => stop
+In principle, for each argument,
+  if it exists as a file/directory, it will be a file/directory, else a value.
 
-All rules can be overridden for individual items.
-2., 3., 6. can be overridden for the entire invocation => value
+But there are three rules that must be respected, else an exception is raised.
+
+1. Any argument with extension must exist as a file, but not as a directory.
+2. Any argument (beyond the first) without extension must not exist as a file
+    (directories are fine)
+3. Any argument ending with a slash must be a directory.
+4. Otherwise:
+- If the argument doesn't exist => value
+- If it exists as file => file
+- If it exists as directory => directory
+
+1.,2. can be overridden => value
+In workspace mode, for each argument, guessing may or may not be used.
+
 
 Be very verbose. Dry-run option. Give individual sizes, say what needs to be uploaded to the database.
 Indicate if there is a result, and how much it is to download.
@@ -34,7 +42,7 @@ Indicate if there is a result, and how much it is to download.
 
 - Literal (default for command mode). Least reproducible. All paths must be subfolders of the current directory.
 - Literal, but strip directories. No subfolder restriction, but no files can have same name.
-- Rename to file1.py, file2.txt, etc. (default for script mode)
+- Rename to file1.py, file2.txt, etc. (default for workspace mode)
 - Rename to file1, file2, etc. Most reproducible, but least informative error messages. Some tools may fail.
 - No guessing at all, require assistant.
 
