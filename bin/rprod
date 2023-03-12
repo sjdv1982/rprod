@@ -90,6 +90,8 @@ def _get_rprodfile(path: Path) -> Path or None:
         rprodfiles.append(Path(stem + ".rprod"))
     if len(suffix):
         rprodfiles.append(Path(stem + ".rprod" + suffix))
+    # TODO: special directory:  - /home/$USER/.rprod/stem.rprod 
+    #                           - /home/$USER/.rprod/full/path/stem.rprod
     for rprodfile in rprodfiles:
         msg(3, "search rprodfile... : {}".format(rprodfile.as_posix()))
         if rprodfile.exists():

@@ -48,6 +48,16 @@ Indicate if there is a result, and how much it is to download.
 
 Add an include (-i) option to inject additional files not part of the command. You can do -il to specify -l for those files, -ilx for -lx, etc.
 
+NOTE: isn't "include" YAGNI?? Would make sense in an rprod file.
+But then, might as well add it to argdict.
+Unless... a script has an rprodfile AND a command line interface!
+/NOTE
+
+NOTE
+In dummy configuration, workspace mode still requires rprod to do work, reading
+the rprodfile and synthesizing a new bash command
+/NOTE
+
 ## Result read modes
 
 - Read from stdout (default in command mode)
@@ -66,7 +76,7 @@ Rprod always writes stderr to stderr, unless cache hit.
 
 ## Assistants
 
-For script mode, as_file or as_var can be read from comments in the script, if the order is fixed and no options.
+Only for workspace mode (the presence of a rprodfile is the defining feature).
 
 Command/script assistant (.rprod or .rprod.py/.rprod.sh/.rprod.bash extension, same name as script/command. Look in same dir as script, and in special directory too)
 Script, must be executable, normally Python script with argparse.

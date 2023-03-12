@@ -1,8 +1,6 @@
 from typing import Dict, List, Any
 from pathlib import Path
 import os
-
-
 def guess_arguments_with_custom_error_messages(
     args: List[str],
     *,
@@ -46,8 +44,7 @@ def guess_arguments_with_custom_error_messages(
     - overrule_ext: if True, rule 1. does not apply.
 
     - overrule_no_ext: if True, rule 2. does not apply.
-    """
-    from .message import message as msg
+    """    
 
     order = []
 
