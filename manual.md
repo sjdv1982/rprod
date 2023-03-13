@@ -38,7 +38,7 @@ In workspace mode, for each argument, guessing may or may not be used.
 Be very verbose. Dry-run option. Give individual sizes, say what needs to be uploaded to the database.
 Indicate if there is a result, and how much it is to download.
 
-## File injection mode
+## File mapping mode
 
 - Literal (default for command mode). Least reproducible. All paths must be subfolders of the current directory.
 - Literal, but strip directories. No subfolder restriction, but no files can have same name.
@@ -56,6 +56,10 @@ Unless... a script has an rprodfile AND a command line interface!
 NOTE
 In dummy configuration, workspace mode still requires rprod to do work, reading
 the rprodfile and synthesizing a new bash command
+/NOTE
+
+NOTE
+When executing a command, make sure that the first arg, if file, has a slash or else add ./
 /NOTE
 
 ## Result read modes

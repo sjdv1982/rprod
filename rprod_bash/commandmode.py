@@ -1,15 +1,18 @@
-from typing import Dict, List, Any
+from typing import Any
 from pathlib import Path
 import os
+
+from .message import message as msg
+
 def guess_arguments_with_custom_error_messages(
-    args: List[str],
+    args: list[str],
     *,
     rule_ext_error_message,
     rule_no_ext_error_message,
     rule_no_slash_error_message,
     overrule_ext: bool = False,
     overrule_no_ext: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Guess for each argument if it represents a file, directory or value.
 
     In principle, for each argument,
@@ -44,7 +47,7 @@ def guess_arguments_with_custom_error_messages(
     - overrule_ext: if True, rule 1. does not apply.
 
     - overrule_no_ext: if True, rule 2. does not apply.
-    """    
+    """
 
     order = []
 
@@ -65,28 +68,28 @@ def guess_arguments_with_custom_error_messages(
         if not overrule_ext:
             if extension and not arg.endswith(os.sep):
                 if not exists:
-                    msg = "Argument does not exist.\n" + rule_ext_error_message
-                    raise ValueError(msg.format(argindex=argindex, arg=arg))
+                    errmsg = "Argument does not exist.\n" + rule_ext_error_message
+                    raise ValueError(errmsg.format(argindex=argindex, arg=arg))
                 if is_dir:
-                    msg = "Argument is a directory.\n" + rule_ext_error_message
-                    raise ValueError(msg.format(argindex=argindex, arg=arg))
+                    errmsg = "Argument is a directory.\n" + rule_ext_error_message
+                    raise ValueError(errmsg.format(argindex=argindex, arg=arg))
 
         # Rule 2.: Any argument (beyond the first) without extension must not exist as a file
         #          (directories are fine)
         if not overrule_no_ext:
             if argindex > 1 and not extension:
                 if exists and not is_dir:
-                    msg = rule_no_ext_error_message
-                    raise ValueError(msg.format(argindex=argindex, arg=arg))
+                    errmsg = rule_no_ext_error_message
+                    raise ValueError(errmsg.format(argindex=argindex, arg=arg))
 
         # Rule 3.: Any argument ending with a slash must be a directory
         if arg.endswith(os.sep):
             if not exists:
-                msg = "Argument does not exist.\n" + rule_no_slash_error_message
-                raise ValueError(msg.format(argindex=argindex, arg=arg))
+                errmsg = "Argument does not exist.\n" + rule_no_slash_error_message
+                raise ValueError(errmsg.format(argindex=argindex, arg=arg))
             if not is_dir:
-                msg = "Argument is not a directory.\n" + rule_no_slash_error_message
-                raise ValueError(msg.format(argindex=argindex, arg=arg))
+                errmsg = "Argument is not a directory.\n" + rule_no_slash_error_message
+                raise ValueError(errmsg.format(argindex=argindex, arg=arg))
 
         if exists:
             if is_dir:
@@ -100,11 +103,11 @@ def guess_arguments_with_custom_error_messages(
 
 
 def guess_arguments(
-    args: List[str],
+    args: list[str],
     *,
     overrule_ext: bool = False,
     overrule_no_ext: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Guess for each argument if it represents a file, directory or value.
 
     In principle, for each argument,

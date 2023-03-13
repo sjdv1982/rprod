@@ -12,6 +12,10 @@ import json
 
 from rprod_bash.message import set_verbosity, message as msg
 from rprod_bash.commandmode import guess_arguments
+from rprod_bash.file_mapping import get_file_mapping
+from rprod_bash.file_load import files_to_checksums
+
+from rprod.bash_transformation import run_bash_transformation
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -38,6 +42,58 @@ parser.add_argument(
     help="""Disable file/value guess rule 2.
 This rule states that any argument without file extension must not exist as a file.""",
     action="store_true",
+)
+
+parser.add_argument(
+    "-w",
+    help="""Set the working directory to $HOME.
+This allows any file in $HOME to be specified as argument.""",
+    dest="workdir",
+    action="store_const",
+    const=os.path.expanduser("~"),
+)
+
+parser.add_argument(
+    "-W",
+    help="""Set the working directory to /.
+This allows any file to be specified as argument.""",
+    dest="workdir",
+    action="store_const",
+    const="/",
+)
+
+parser.add_argument(
+    "-ms",
+    help="""Set the file mapping mode to 'strip'.
+Strip directory names. After stripping, all files must be unique.""",
+    dest="file_mapping_mode",
+    action="store_const",
+    const="strip"
+)
+
+parser.add_argument(
+    "-mr",
+    help="""Set the file mapping mode to 'rename'.
+Rename to file1, file2, ....""",
+    dest="file_mapping_mode",
+    action="store_const",
+    const="rename"
+)
+
+parser.add_argument(
+    "-mx",
+    help="""Set the file mapping mode to 'rename_with_ext'.
+Rename to file1.txt, file2.py, ....""",
+    dest="file_mapping_mode",
+    action="store_const",
+    const="rename_with_ext"
+)
+
+parser.add_argument(
+    "-c",
+    help="Unquote the command line",
+    dest="unquote",
+    action="store_true"
 )
 
 parser.add_argument(
@@ -82,6 +138,17 @@ if len(command) == 0:
     parser.print_usage()  # TODO: add to usage message
     sys.exit(0)
 
+workdir = os.getcwd()
+if args.workdir is not None:
+    workdir = args.workdir
+    msg(1, "set working directory to: {}".format(workdir))
+
+if args.unquote:
+    if len(command) != 1:
+        msg(-1, "Unquote requires a single argument")
+        sys.exit(1)
+    # TODO: better bash lexing
+    command = command[0].replace(';', " ; ").split()
 
 def _get_rprodfile(path: Path) -> Path or None:
     rprodfiles = [Path(path.as_posix() + ".rprod")]
@@ -90,7 +157,7 @@ def _get_rprodfile(path: Path) -> Path or None:
         rprodfiles.append(Path(stem + ".rprod"))
     if len(suffix):
         rprodfiles.append(Path(stem + ".rprod" + suffix))
-    # TODO: special directory:  - /home/$USER/.rprod/stem.rprod 
+    # TODO: special directory:  - /home/$USER/.rprod/stem.rprod
     #                           - /home/$USER/.rprod/full/path/stem.rprod
     for rprodfile in rprodfiles:
         msg(3, "search rprodfile... : {}".format(rprodfile.as_posix()))
@@ -162,10 +229,11 @@ if rprodfile is None and len(command) > 1 and not arg1.suffix:
             )
             msg(0, "select second argument as workspace script")
             workspace_script_argindex = 2
-
+            
 if rprodfile is None:
     msg(2, "no rprodfile found")
     msg(1, "select COMMAND mode")
+    command_mode = True
     overrule_ext, overrule_no_ext = False, False
     if args.g1:
         msg(1, "disable file/value guess rule 1")
@@ -180,9 +248,43 @@ if rprodfile is None:
     except ValueError as exc:
         msg(-1, *exc.args)
         sys.exit(1)
-    argdictstr = json.dumps(argdict, sort_keys=True, indent=2)
-    msg(1, "argument dict:\n" + argdictstr)
 else:
     assert workspace_script_argindex
     msg(1, "select WORKSPACE mode")
+    command_mode = False  # TODO: may be set to true later, after running the rprodfile...
     raise NotImplementedError  # workspace mode
+
+argdictstr = json.dumps(argdict, sort_keys=True, indent=2)
+msg(1, "argument dict:\n" + argdictstr)
+
+file_mapping_mode = args.file_mapping_mode
+if file_mapping_mode is None:
+    file_mapping_mode = "literal"
+arg_mapping, file_mapping = get_file_mapping(argdict, mapping_mode=file_mapping_mode, working_directory=workdir)
+# TODO: max_files, max_datasize option
+file_checksum_dict = files_to_checksums(file_mapping.values(), max_datasize=None, max_files=None)
+
+rev_file_mapping = {v:k for k,v in file_mapping.items()}
+checksum_dict = {rev_file_mapping[k]: v for k,v in file_checksum_dict.items()}
+checksum_dictstr = json.dumps(checksum_dict, sort_keys=True, indent=2)
+msg(2, "file/directory checksum dict:\n" + checksum_dictstr)
+directories = [arg_mapping[arg] for arg in argdict if argdict[arg] == "directory"]
+if len(directories):
+    msg(2, "directories:", directories)
+
+if command_mode:
+    mapped_command = []
+    for arg in command:
+        if argdict[arg] == "value":
+            mapped_command.append(arg)
+        else:
+            mapped_command.append(arg_mapping[arg])
+    bash_command = " ".join(mapped_command)
+    msg(1, "bash command:\n", bash_command, "\n")
+    # TODO: result mode
+    result_mode = "stdout"
+    result = run_bash_transformation(bash_command, checksum_dict, directories=directories, result_mode=result_mode)
+else:
+    raise NotImplementedError # workspace mode
+print(result)
+# TODO: result mode
