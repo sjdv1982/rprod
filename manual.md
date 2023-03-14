@@ -64,6 +64,8 @@ When executing a command, make sure that the first arg, if file, has a slash or 
 
 TODO: describe rprod-auto, add activate.sh to $CONDA_PREFIX/etc/conda/activate.d/
 
+NOTE: Need direct print!
+
 ## Result read modes
 
 - Read from stdout (default in command mode)

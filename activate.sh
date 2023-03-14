@@ -30,8 +30,9 @@ else:
 
 function rprod-auto() {
     if [ -z "$_RPROD_OLD_PS1" ]; then
-        _RPROD_OLD_PS1=$PS1
-        PS1='\033[01;31m\][rprod]\033[00m\]'$PS1
+        _=''
+        ###_RPROD_OLD_PS1=$PS1
+        ###PS1='\033[01;31m\][rprod]\033[00m\]'$PS1
     fi
     RPROD_OPTS=$*
     if [ -z "$1" ]; then
@@ -49,7 +50,8 @@ function rprod-auto-off() {
     echo 'rprod auto OFF'
     bind '"\C-M": accept-line'
     if [ -n "$_RPROD_OLD_PS1" ]; then
-        PS1=$_RPROD_OLD_PS1
+        _=''
+        ###PS1=$_RPROD_OLD_PS1
     fi
 
 }

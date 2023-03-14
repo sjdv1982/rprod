@@ -89,7 +89,7 @@ def files_to_checksums(
             size = "{:.2f} GiB".format(datasize / 10**9)
         elif datasize > 10**6:
             size = "{:.2f} MiB".format(datasize / 10**6)
-        if datasize > 10**4:
+        elif datasize > 10**4:
             size = "{:.2f} KiB".format(datasize / 10**3)
         else:
             size = "{} bytes".format(datasize)
