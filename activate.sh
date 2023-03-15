@@ -1,12 +1,11 @@
 function _rprod_complete() {
-    echo $READLINE_LINE
     READLINE_LINE=$(_rprodize $READLINE_LINE @@@ $RPROD_OPTS)
 }
 
 function rprod-auto() {
     if [ -z "$_RPROD_OLD_PS1" ]; then
         _RPROD_OLD_PS1=$PS1
-        PS1='\033[01;95m\][rprod]\033[00m\]\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ \[\]\[\]'
+        PS1='\[\e[32;95m\][rprod]\[\e[0m\] \u@\h:\w$ '
     fi
     RPROD_OPTS=$*
     if [ -z "$1" ]; then
@@ -33,10 +32,12 @@ function rprod-auto-off() {
 function rprod-auto-toggle() {
     if [ -n "$RPROD_AUTO_ON" ]; then
         unset RPROD_AUTO_ON
+        echo rprod-auto-off
         rprod-auto-off
     else
         RPROD_AUTO_ON=1
-        rprod-auto
+        echo rprod-auto '-v'
+        rprod-auto '-v'
     fi 
 }    
 
