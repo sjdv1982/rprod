@@ -79,6 +79,7 @@ def get_file_mapping(
                 ndirectories += 1
             fullpath = Path(argname).resolve().as_posix()
             if mapping_mode == "literal":
+                argname2 = argname
                 if not fullpath.startswith(cwd):
                     errmsg = """Argument {} is not under the current working directory.
 This is required under 'literal' file mapping. 
@@ -88,6 +89,7 @@ Select a different file mapping mode to solve this problem."""
                     relpath = "."
                 elif cwd == os.sep:
                     relpath = fullpath
+                    argname2 = fullpath[1:]
                 else:
                     relpath = fullpath[len(cwd) + 1 :]
                 if argname != relpath:
@@ -95,8 +97,8 @@ Select a different file mapping mode to solve this problem."""
                         3,
                         "Resolve {} to relative path '{}'".format(argdescr, relpath),
                     )
-                arg_mapping[argname] = argname
-                file_mapping[argname] = relpath
+                arg_mapping[argname] = argname2
+                file_mapping[argname2] = relpath
 
             elif mapping_mode == "strip":
                 path = argname
