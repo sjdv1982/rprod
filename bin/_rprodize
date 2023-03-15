@@ -5,6 +5,7 @@ import sys, os, re
 skipwords= "cd rm ls mv cp \
 exit source echo function set unset let export \
 conda mamba pip apt \
+more less \
 code nano vi emacs gedit"
 
 skipwords = skipwords.split()
