@@ -38,6 +38,7 @@ def check_file(filename: str) -> tuple[bool, int]:
 def files_to_checksums(
     filelist: list[str],
     *,
+    directories = list[str],
     max_files: int | None,
     max_datasize: int | None,
     nparallel: int = 20
@@ -48,9 +49,13 @@ def files_to_checksums(
     max_files: the maximum number of files to send to the database.
     max_datasize: the maximum data size (in bytes) to send to the database.
     nparallel: number of files to process simultaneously
+    directories: entries in filelist that are directories instead of files
     """
 
     db_put = True
+
+    if len(directories):
+        raise NotImplementedError
 
     """
     TODO: if the database has been started locally, set db_put to false
@@ -82,7 +87,8 @@ def files_to_checksums(
                         2,
                         "Already in database: '{}', checksum {}, length {}".format(
                             filename, checksum, buffer_length
-                        ),                    )
+                        ),
+                    )
         if not len(filelist2):
             return result
         if datasize > 10**9:

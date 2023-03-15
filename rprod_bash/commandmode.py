@@ -4,6 +4,7 @@ import os
 
 from .message import message as msg
 
+
 def guess_arguments_with_custom_error_messages(
     args: list[str],
     *,
@@ -131,7 +132,7 @@ def guess_arguments(
     rule_ext_error_message = """Argument #{argindex} '{arg}' has an extension.
 Therefore, it must exist as a file.
 To disable this rule, specify the -g1 option."""
-#TODO: add something in case of -c and ?/* 
+    # TODO: add something in case of -c and ?/*
     rule_no_ext_error_message = """Argument #{argindex} '{arg}' has no extension.
 Unless it is the first argument, it can't exist as a file.
 To disable this rule, specify the -g2 option."""

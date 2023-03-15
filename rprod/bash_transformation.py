@@ -23,6 +23,7 @@ from seamless.imperative import _run_transformer as run_transformer
 
 # / TODO
 
+
 def run_bash_transformation(
     code: str,
     checksum_dict: dict[str, str],
@@ -46,7 +47,7 @@ def run_bash_transformation(
 
     if result_mode == "directory":
         raise NotImplementedError
-    
+
     if len(directories):
         raise NotImplementedError
 
@@ -54,14 +55,14 @@ def run_bash_transformation(
         bashcode = "(\n" + code + "\n) > RESULT"
     else:
         raise NotImplementedError
-    
+
     pins = sorted(checksum_dict.keys())
     kwargs = {
         "bashcode": bashcode,
         "pins_": pins,
     }
-    assert "bashcode" not in checksum_dict #TODO: workaround
-    assert "pins_" not in checksum_dict #TODO: workaround
+    assert "bashcode" not in checksum_dict  # TODO: workaround
+    assert "pins_" not in checksum_dict  # TODO: workaround
 
     kwargs.update(checksum_dict)
     celltypes = {
@@ -90,8 +91,5 @@ def run_bash_transformation(
     except UnicodeDecodeError:
         result = result0
     return result
-
-    
-
 
     # TODO: add support for filesystem __format__ annotation

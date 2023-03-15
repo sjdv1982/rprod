@@ -51,6 +51,8 @@ def get_file_mapping(
     ndirectories = 0
     nfilepatterns = 0
     cwd = Path(working_directory).resolve().as_posix()
+    if cwd != os.sep:
+        cwd = cwd.rstrip(os.sep)
 
     def get_argdescr(argname):
         argdescr = "'{}'".format(argname)
@@ -58,7 +60,7 @@ def get_file_mapping(
             pos = argdict.get("@order", []).index(argname) + 1
         except IndexError:
             pass
-        else:        
+        else:
             argdescr = "#{} '{}'".format(pos, argname)
         return argdescr
 
@@ -84,8 +86,10 @@ Select a different file mapping mode to solve this problem."""
                     raise ValueError(errmsg.format(argdescr))
                 if fullpath == cwd:
                     relpath = "."
+                elif cwd == os.sep:
+                    relpath = fullpath
                 else:
-                    relpath = fullpath[len(cwd)+1:]
+                    relpath = fullpath[len(cwd) + 1 :]
                 if argname != relpath:
                     msg(
                         3,

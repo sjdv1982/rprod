@@ -71,7 +71,7 @@ def run_command_literal(command):
         kwargs=kwargs,
         celltypes=celltypes,
         result_callback=None,
-        modules={}
+        modules={},
     )
     try:
         result = result0.decode()

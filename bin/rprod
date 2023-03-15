@@ -61,7 +61,7 @@ parser.add_argument(
 Strip directory names. After stripping, all files must be unique.""",
     dest="file_mapping_mode",
     action="store_const",
-    const="strip"
+    const="strip",
 )
 
 parser.add_argument(
@@ -70,7 +70,7 @@ parser.add_argument(
 Rename to file1, file2, ....""",
     dest="file_mapping_mode",
     action="store_const",
-    const="rename"
+    const="rename",
 )
 
 parser.add_argument(
@@ -79,14 +79,11 @@ parser.add_argument(
 Rename to file1.txt, file2.py, ....""",
     dest="file_mapping_mode",
     action="store_const",
-    const="rename_with_ext"
+    const="rename_with_ext",
 )
 
 parser.add_argument(
-    "-c",
-    help="Unquote the command line",
-    dest="unquote",
-    action="store_true"
+    "-c", help="Unquote the command line", dest="unquote", action="store_true"
 )
 
 parser.add_argument(
@@ -149,7 +146,8 @@ if args.unquote:
         msg(-1, "Unquote requires a single argument")
         sys.exit(1)
     # TODO: better bash lexing
-    command = command[0].replace(';', " ; ").split()
+    command = command[0].replace(";", " ; ").split()
+
 
 def _get_rprodfile(path: Path) -> Path or None:
     rprodfiles = [Path(path.as_posix() + ".rprod")]
@@ -230,7 +228,7 @@ if rprodfile is None and len(command) > 1 and not arg1.suffix:
             )
             msg(0, "select second argument as workspace script")
             workspace_script_argindex = 2
-            
+
 if rprodfile is None:
     msg(2, "no rprodfile found")
     msg(1, "select COMMAND mode")
@@ -252,7 +250,9 @@ if rprodfile is None:
 else:
     assert workspace_script_argindex
     msg(1, "select WORKSPACE mode")
-    command_mode = False  # TODO: may be set to true later, after running the rprodfile...
+    command_mode = (
+        False  # TODO: may be set to true later, after running the rprodfile...
+    )
     raise NotImplementedError  # workspace mode
 
 argdictstr = json.dumps(argdict, sort_keys=True, indent=2)
@@ -261,15 +261,24 @@ msg(1, "argument dict:\n" + argdictstr)
 file_mapping_mode = args.file_mapping_mode
 if file_mapping_mode is None:
     file_mapping_mode = "literal"
-arg_mapping, file_mapping = get_file_mapping(argdict, mapping_mode=file_mapping_mode, working_directory=workdir)
-# TODO: max_files, max_datasize option
-file_checksum_dict = files_to_checksums(file_mapping.values(), max_datasize=None, max_files=None)
+try:
+    arg_mapping, file_mapping = get_file_mapping(
+        argdict, mapping_mode=file_mapping_mode, working_directory=workdir
+    )
+except ValueError as exc:
+    msg(-1, *exc.args)
+    sys.exit(1)
 
-rev_file_mapping = {v:k for k,v in file_mapping.items()}
-checksum_dict = {rev_file_mapping[k]: v for k,v in file_checksum_dict.items()}
+# TODO: max_files, max_datasize option
+directories = [arg_mapping[arg] for arg in argdict if argdict[arg] == "directory"]
+file_checksum_dict = files_to_checksums(
+    file_mapping.values(), max_datasize=None, max_files=None, directories=directories
+)
+
+rev_file_mapping = {v: k for k, v in file_mapping.items()}
+checksum_dict = {rev_file_mapping[k]: v for k, v in file_checksum_dict.items()}
 checksum_dictstr = json.dumps(checksum_dict, sort_keys=True, indent=2)
 msg(2, "file/directory checksum dict:\n" + checksum_dictstr)
-directories = [arg_mapping[arg] for arg in argdict if argdict[arg] == "directory"]
 if len(directories):
     msg(2, "directories:", directories)
 
@@ -284,8 +293,10 @@ if command_mode:
     msg(1, "bash command:\n", bash_command, "\n")
     # TODO: result mode
     result_mode = "stdout"
-    result = run_bash_transformation(bash_command, checksum_dict, directories=directories, result_mode=result_mode)
+    result = run_bash_transformation(
+        bash_command, checksum_dict, directories=directories, result_mode=result_mode
+    )
 else:
-    raise NotImplementedError # workspace mode
+    raise NotImplementedError  # workspace mode
 print(result)
 # TODO: result mode
