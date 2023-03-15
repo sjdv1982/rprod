@@ -83,15 +83,22 @@ def get_file_mapping(
                 if not fullpath.startswith(cwd):
                     errmsg = """Argument {} is not under the current working directory.
 This is required under 'literal' file mapping. 
-Select a different file mapping mode to solve this problem."""
+To solve this problem:
+- Select a different file mapping mode (-ms, -mr, or -mx)
+or:
+- Specify a different working directory (-w or -W)
+"""
                     raise ValueError(errmsg.format(argdescr))
                 if fullpath == cwd:
                     relpath = "."
                 elif cwd == os.sep:
                     relpath = fullpath
                     argname2 = fullpath[1:]
-                else:
+                elif cwd == os.getcwd():
                     relpath = fullpath[len(cwd) + 1 :]
+                else:
+                    relpath = fullpath
+                    argname2 = fullpath[len(cwd) + 1 :]
                 if argname != relpath:
                     msg(
                         3,
